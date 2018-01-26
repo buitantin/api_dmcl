@@ -15,9 +15,11 @@ const csrf= require("lusca").csrf();
 app.use(session({
 	secret:"dmclapi"
 }));
+
 app.use((req, res, next) => csrf(req, res, next))
 
 app.use(bodyParser.json());
+
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.use("/",route);
