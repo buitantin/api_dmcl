@@ -19,15 +19,7 @@ const fs = require("fs");
         }
     });
 
-router.get("/",(req,res)=>{ res.send("API DMCL")});
-router.get("/default/server/gettoken",(req,res)=>controllers.IndexController.index(req,res))
-
-
-
-router.get("/a",function(req,res){
-	res.send("hello");
-	return true;
-});
+router.get("/my-test",(req,res)=>{ res.send("API DMCL")});
 
 
 

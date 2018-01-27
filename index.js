@@ -6,6 +6,8 @@ const app =express();
 
 const route = require("./routes/route");
 
+const test= require("./routes/test");
+
 const bodyParser= require("body-parser");
 
 const session =require("express-session");
@@ -23,6 +25,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.use("/",route);
+app.use("/",test);
 
 var s=app.listen(2000,function(){
 	console.log("Listen prost: 2000");
