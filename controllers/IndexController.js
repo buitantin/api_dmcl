@@ -1,9 +1,10 @@
+const presto = require('presto-client');
 exports.index=function(req,res){
-	var presto = require('presto-client');
+	
 		var client = new presto.Client({user: 'presto',catalog:"mysql",schema:"beta"});
 		 
 		client.execute({
-		  query:   'SELECT id,status,name  FROM pro_product',
+		  query:   'SELECT id  FROM pro_product LIMIT 1',
 
 		 
 		 state:   function(error, query_id, stats){ 
