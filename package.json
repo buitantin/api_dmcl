@@ -1,0 +1,20 @@
+{
+  "name": "api",
+  "version": "1.0.0",
+  "description": "API FOR DM",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon"
+  },
+  "keywords": [
+    "APIDMCL"
+  ],
+  "author": "DMCL",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.16.2",
+    "express-session": "^1.15.6",
+    "lusca": "^1.5.2",
+    "presto-client": "^0.1.3"
+  }
+}
