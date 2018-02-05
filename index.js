@@ -7,22 +7,22 @@ const app =express();
 const route = require("./routes/route");
 
 const test= require("./routes/test");
-
-const bodyParser= require("body-parser");
+const expressValidator = require('express-validator');
 
 const session =require("express-session");
 
 const csrf= require("lusca").csrf();
 
 app.use(session({
-	secret:"dmclapi"
+	secret:"dienmaycholonAPI"
 }));
 
 app.use((req, res, next) => csrf(req, res, next))
 
-app.use(bodyParser.json());
 
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(expressValidator());
+
+
 
 app.use("/",route);
 app.use("/",test);

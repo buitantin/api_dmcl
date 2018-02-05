@@ -1,0 +1,10 @@
+<soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:orderwsdl2">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <urn:get_data soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+         <from_date xsi:type="xsd:date">2017-11-22</from_date>
+         <to_date xsi:type="xsd:date">2018-01-29</to_date>
+         <pass xsi:type="xsd:string">dienmaycholon5r75476456455634578</pass>
+      </urn:get_data>
+   </soapenv:Body>
+</soapenv:Envelope>

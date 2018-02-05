@@ -3,10 +3,11 @@
 const express= require("express");
 
 const router = express.Router();
-router.use(function timeLog(req,res,next){
+const bodyParser = require('body-parser');
 
+/*router.use(function timeLog(req,res,next){
 	next();
-});
+});*/
 
 const fs = require("fs");
 
@@ -18,17 +19,26 @@ const fs = require("fs");
             controllers[file.split('.')[0]] = require(controllers_path + '/' + file);
         }
     });
+    
+router.use(bodyParser.urlencoded({
+    extended: true
+}));
 
 router.get("/",(req,res)=>{ res.send("API DMCL")});
-router.get("/default/server/gettoken",(req,res)=>controllers.IndexController.index(req,res))
+router.get("/default/server/gettoken",(req,res)=>controllers.IndexController.getToken(req,res))
 
 
-
-router.get("/a",function(req,res){
-	res.send("hello");
-	return true;
+router.get("/test-presto",function(req,res){
+ 	controllers.IndexController.test(req,res);
 });
 
 
+router.get("/server/get_data",function(req,res){
+ 	controllers.ServerController.get_data(req,res);
+});
+
+router.get("/server/get_data_tra_gop",function(req,res){
+ 	controllers.ServerController.get_data_installment(req,res);
+});
 
 module.exports = router;
