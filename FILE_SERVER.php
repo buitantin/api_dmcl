@@ -1,5 +1,249 @@
 <?php
 
+if($_SERVER['SERVER_NAME']=='192.168.150.63'){
+        $hostname = "localhost";
+        $pass = "123";
+        $user     = "root";
+        $db ="dmcl12";
+}else{
+    $hostname = "192.168.222.1";
+
+    $pass = "1.2.3@987DMCL";
+    $user     = "udbdmclnew";
+
+    $db ="dbdmclnew_2014";
+    }
+
+$dbconn = mysql_connect($hostname, $user, $pass) or die("hello,not connect to mysql"); 
+//mysql_close($dbconn);
+
+mysql_select_db($db);
+mysql_set_charset('utf8',$dbconn);
+require_once('./lib/nusoap.php');
+// Create the client instance
+//Create a new soap server
+$server = new soap_server();
+$server->configureWSDL('orderwsdl2', 'urn:orderwsdl2');
+$server->soap_defencoding = 'UTF-8';
+$server->decode_utf8 = false;
+$server->encode_utf8 = true;
+// Register the data structures used by the service
+/***********************************************************GET DATA *************************/
+$server->wsdl->addComplexType(
+    'OrderObject',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        
+        'madonhang' => array('name' => 'madonhang', 'type' => 'xsd:string'),
+        'ngaymua' => array('name' => 'ngaymua', 'type' => 'xsd:string'),
+        'ngaygiao' => array('name' => 'ngaygiao', 'type' => 'xsd:string'),
+        'hinhthucthanhtoan'  => array('name' => 'hinhthucthanhtoan', 'type' => 'xsd:string'),
+        'tongdonhang'  => array('name' => 'tongdonhang', 'type' => 'xsd:string'),
+        'ghichu'  => array('name' => 'ghichu', 'type' => 'xsd:string'),
+        'tonggiam'  => array('name' => 'tonggiam', 'type' => 'xsd:string'),
+        'buoigiaohang'     => array('name' => 'buoigiaohang', 'type' => 'xsd:string'),
+        'bill_fullname'     => array('name' => 'bill_fullname', 'type' => 'xsd:string'),
+        'bill_phone'     => array('name' => 'bill_phone', 'type' => 'xsd:string'),
+        'bill_email'     => array('name' => 'bill_email', 'type' => 'xsd:string'),
+        'bill_address'     => array('name' => 'bill_address', 'type' => 'xsd:string'),
+        'bill_city'     => array('name' => 'bill_city', 'type' => 'xsd:string'),
+        'bill_district'     => array('name' => 'bill_district', 'type' => 'xsd:string'),
+        'sh_fullname'     => array('name' => 'sh_fullname', 'type' => 'xsd:string'),
+        'sh_phone'     => array('name' => 'sh_phone', 'type' => 'xsd:string'),
+        'sh_email'     => array('name' => 'sh_email', 'type' => 'xsd:string'),
+        'sh_company'     => array('name' => 'sh_company', 'type' => 'xsd:string'),
+        'sh_address'     => array('name' => 'sh_address', 'type' => 'xsd:string'),
+        'sh_district'     => array('name' => 'sh_district', 'type' => 'xsd:string'),
+        'sh_city'     => array('name' => 'sh_city', 'type' => 'xsd:string'),
+        'sh_addresscompany'     => array('name' => 'sh_addresscompany', 'type' => 'xsd:string'),
+        'sh_faxcompany'     => array('name' => 'sh_faxcompany', 'type' => 'xsd:string')
+   )
+);
+$server->wsdl->addComplexType('ListOrder',
+    'complexType',
+    'array',
+    '',
+    'SOAP-ENC:Array',
+    array(),
+    array(
+        array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'tns:OrderObject[]')
+    ),
+    'tns:OrderObject'
+);
+
+$server->register('get_data',
+    array('from_date' => 'xsd:date', 'to_date'=> 'xsd:date', 'pass' =>'xsd:string'),
+    array('return' => 'tns:ListOrder'),
+    'urn:orderwsdl2',
+    'orderwsdl2#get_data',
+    'rpc',
+    'encoded',
+    'Returns array data in php web service'
+);
+
+//lay thong tin don hang
+
+function get_data($from_date,$to_date,$pass)
+{
+	$where='';
+    $p = 'dienmaycholon5r75476456455634578';
+    $p = md5(md5($p));
+    if($p == md5(md5($pass)) && !empty($pass))
+    {      
+  		$where .= " or_or.date_bill >= '".$from_date." 00:00:00' and or_or.date_bill <= '".$to_date." 23:59:59' and or_or.approved=0 and or_or.is_ins = '0'";	
+        $query = "SELECT 
+                    or_or.code_order as madonhang,or_or.date_bill as ngaymua,or_or.date_ship as ngaygiao,or_or.pay_type as hinhthucthanhtoan,or_or.total_or as tongdonhang,or_or.order_info as ghichu,
+                    or_or.dis_price as tonggiam,or_or.session as buoigiaohang,
+                    or_ad.fullname as bill_fullname,or_ad.phone as bill_phone,or_ad.email as bill_email,or_ad.address as bill_address,city2.name as bill_city,city3.name as bill_district,
+                    or_sh.fullname as sh_fullname,or_sh.phone as sh_phone,or_sh.email as sh_email,
+                    or_sh.company as sh_company,or_sh.address as sh_address,city1.name as sh_district,city.name as sh_city,
+                    or_sh.addresscompany as sh_addresscompany,or_sh.faxcompany as sh_faxcompany
+                    FROM or_order or_or 
+                    LEFT JOIN or_billing_address or_ad ON or_or.id=or_ad.cid_order
+                    INNER JOIN or_shipping_address or_sh ON or_sh.cid_order=or_or.id
+                    INNER JOIN tm_cities city ON city.id=or_sh.city
+                    INNER JOIN tm_cities city1 ON city1.id=or_sh.distict
+                    LEFT JOIN tm_cities city2 ON city2.id=or_ad.city
+                    LEFT JOIN tm_cities city3 ON city3.id=or_ad.district
+                    WHERE".$where." LIMIT 5";
+        $result = mysql_query($query);
+        $a = array();
+        while($row = mysql_fetch_assoc($result))
+        {
+            $a[] = $row;
+        }
+        $return=array();
+          for($i=0;$i<=count($a)-1;$i++) {
+           $return[$i]=$a[$i];
+        }
+    	return $return;
+    }
+    mysql_close($dbconn);
+}
+/***********************************************************END GET DATA *************************/
+
+/***********************************************************GET DON HANG TRA GOP *************************/
+$server->wsdl->addComplexType(
+    'OrdertragopObject',
+    'complexType',
+    'struct',
+    'all',
+    '',
+    array(
+        'id_order' => array('name' => 'id_order', 'type' => 'xsd:string'),
+        'madonhang' => array('name' => 'madonhang', 'type' => 'xsd:string'),
+        'ngaymua' => array('name' => 'ngaymua', 'type' => 'xsd:string'),
+        'ngaygiao' => array('name' => 'ngaygiao', 'type' => 'xsd:string'),
+        'hinhthucthanhtoan'  => array('name' => 'hinhthucthanhtoan', 'type' => 'xsd:string'),
+        'tongdonhang'  => array('name' => 'tongdonhang', 'type' => 'xsd:string'),
+        'ghichu'  => array('name' => 'ghichu', 'type' => 'xsd:string'),
+        'tonggiam'  => array('name' => 'tonggiam', 'type' => 'xsd:string'),
+        'buoigiaohang'     => array('name' => 'buoigiaohang', 'type' => 'xsd:string'),
+        'bill_fullname'     => array('name' => 'bill_fullname', 'type' => 'xsd:string'),
+        'bill_phone'     => array('name' => 'bill_phone', 'type' => 'xsd:string'),
+        'bill_email'     => array('name' => 'bill_email', 'type' => 'xsd:string'),
+        'bill_address'     => array('name' => 'bill_address', 'type' => 'xsd:string'),
+        'bill_city'     => array('name' => 'bill_city', 'type' => 'xsd:string'),
+        'bill_district'     => array('name' => 'bill_district', 'type' => 'xsd:string'),
+        'sh_fullname'     => array('name' => 'sh_fullname', 'type' => 'xsd:string'),
+        'sh_phone'     => array('name' => 'sh_phone', 'type' => 'xsd:string'),
+        'sh_email'     => array('name' => 'sh_email', 'type' => 'xsd:string'),
+        'sh_company'     => array('name' => 'sh_company', 'type' => 'xsd:string'),
+        'sh_address'     => array('name' => 'sh_address', 'type' => 'xsd:string'),
+        'sh_district'     => array('name' => 'sh_district', 'type' => 'xsd:string'),
+        'sh_city'     => array('name' => 'sh_city', 'type' => 'xsd:string'),
+        'sh_addresscompany'     => array('name' => 'sh_addresscompany', 'type' => 'xsd:string'),
+        'sh_faxcompany'     => array('name' => 'sh_faxcompany', 'type' => 'xsd:string'),
+        'loaitragop' => array('name' => 'loaitragop', 'type' => 'xsd:string'),
+        'muctratruoc' => array('name' => 'muctratruoc', 'type' => 'xsd:string'),
+        'sotienconlai'  => array('name' => 'sotienconlai', 'type' => 'xsd:string'),
+        'thoigiantragop'  => array('name' => 'thoigiantragop', 'type' => 'xsd:string'),
+        'sotienhangthang'  => array('name' => 'sotienhangthang', 'type' => 'xsd:string'),
+        'gender'  => array('name' => 'gender', 'type' => 'xsd:string'),
+        'cmnd' => array('name'=>'cmnd', 'type' => 'xsd:string'),
+        'work' => array('name'=>'work', 'type' => 'xsd:string'),
+        'sohopdong' => array('name'=>'sohopdong', 'type' => 'xsd:string'),
+        'ghichutragop' => array('name'=>'ghichutragop', 'type' => 'xsd:string')
+   )
+);
+$server->wsdl->addComplexType('ListOrdertragop',
+    'complexType',
+    'array',
+    '',
+    'SOAP-ENC:Array',
+    array(),
+    array(
+        array('ref'=>'SOAP-ENC:arrayType','wsdl:arrayType'=>'tns:OrdertragopObject[]')
+    ),
+    'tns:OrdertragopObject'
+);
+
+$server->register('get_data_tra_gop',
+    array('from_date' => 'xsd:date', 'to_date'=> 'xsd:date', 'pass' =>'xsd:string'),
+    array('return' => 'tns:ListOrdertragop'),
+    'urn:orderwsdl2',
+    'orderwsdl2#get_data_tra_gop',
+    'rpc',
+    'encoded',
+    'Returns array data in php web service'
+);
+
+//lay thong tin don hang
+
+function get_data_tra_gop($from_date,$to_date,$pass)
+{
+    $where='';
+    $p = 'dienmaycholon5r75476456455634578';
+    $p = md5(md5($p));
+    if($p == md5(md5($pass)) && !empty($pass))
+    {      
+        $where .= " or_or.date_bill >= '".$from_date." 00:00:00' and or_or.date_bill <= '".$to_date." 23:59:59' and or_or.approved=0 and or_or.is_ins = '1' and or_inspay.status= '0'";
+        $query = "SELECT 
+                    or_or.code_order as madonhang,or_or.date_bill as ngaymua,or_or.date_ship as ngaygiao,or_or.pay_type as hinhthucthanhtoan,or_or.total_or as tongdonhang,or_or.order_info as ghichu,
+                    or_or.dis_price as tonggiam,or_or.session as buoigiaohang,or_or.id as id_order,
+
+                    or_ad.fullname as bill_fullname,or_ad.phone as bill_phone,or_ad.email as bill_email,or_ad.address as bill_address,city2.name as bill_city,city3.name as bill_district,
+                    or_sh.fullname as sh_fullname,or_sh.phone as sh_phone,or_sh.email as sh_email,
+                    or_sh.company as sh_company,or_sh.address as sh_address,city1.name as sh_district,city.name as sh_city,
+                    or_sh.addresscompany as sh_addresscompany,or_sh.faxcompany as sh_faxcompany,
+
+                    or_inspay.type as loaitragop, or_inspay.percent as muctratruoc, or_inspay.price as sotienconlai, or_inspay.time_ins as thoigiantragop, or_inspay.price_month as sotienhangthang, or_inspay.gender, or_inspay.cmnd, or_inspay.work, or_inspay.sohopdong, or_inspay.note as ghichutragop
+
+                    FROM or_order or_or 
+                    LEFT JOIN or_billing_address or_ad ON or_or.id=or_ad.cid_order
+                    INNER JOIN or_shipping_address or_sh ON or_sh.cid_order=or_or.id
+                    INNER JOIN tm_cities city ON city.id=or_sh.city
+                    INNER JOIN tm_cities city1 ON city1.id=or_sh.distict
+                    LEFT JOIN tm_cities city2 ON city2.id=or_ad.city
+                    LEFT JOIN tm_cities city3 ON city3.id=or_ad.district
+                    LEFT JOIN or_installment or_inspay ON or_inspay.is_order=or_or.id
+                    WHERE".$where." LIMIT 5";
+        $result = mysql_query($query);
+        $a = array();
+        while($row = mysql_fetch_assoc($result))
+        {
+            $a[] = $row;
+        }
+        $return=array();
+          for($i=0;$i<=count($a)-1;$i++) {
+           $return[$i]=$a[$i];
+        }
+        return $return;
+    }
+    mysql_close($dbconn);
+}
+/************************************************END GET DON HANG TRA GOP *************************/
+
+
+/***************************************************UPDATE TRẠNG THAI TRẢ GOP*************************/
+$server->register("update_or_installment",
+    array('id_order' => 'xsd:string', 'pass' =>'xsd:string','type'=>'xsd:int', 'note' =>'xsd:string'),
+    array('return' => 'xsd:string'),
+    'urn:orderwsdl2',
+    'orderwsdl2#update_or_installment');
 /*$type: 1 hoac 2
 === 1: DMCL duyet tra gop
 === 2: DMCL huy don hang tra gop

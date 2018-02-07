@@ -11,17 +11,19 @@ const expressValidator = require('express-validator');
 
 const session =require("express-session");
 
-const csrf= require("lusca").csrf();
-
+//const csrf= require("lusca").csrf();
+var cookieParser = require('cookie-parser');
 app.use(session({
-	secret:"dienmaycholonAPI"
+	secret:"dmclapi",
+	resave: true,
+    saveUninitialized: true
 }));
 
-app.use((req, res, next) => csrf(req, res, next))
+//app.use((req, res, next) => csrf(req, res, next))
 
 
 app.use(expressValidator());
-
+app.use(cookieParser());
 
 
 app.use("/",route);
