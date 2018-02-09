@@ -21,9 +21,10 @@ app.use(session({
 
 //app.use((req, res, next) => csrf(req, res, next))
 
-
+require('express-async-await')(app)
 app.use(expressValidator());
 app.use(cookieParser());
+
 
 
 app.use("/",route);

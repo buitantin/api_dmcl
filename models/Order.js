@@ -16,6 +16,7 @@ module.exports.Nodes=function(opts,callback){
 	var Client = new presto.Client(Config);
 	Client.nodes(opts, callback)
 }
+
 module.exports.get_Order=function(stats_callback,callback,success_callback,error_callback){
 	const presto = require("presto-client");
 	var Client = new presto.Client(Config);
@@ -38,7 +39,7 @@ module.exports.get_Order=function(stats_callback,callback,success_callback,error
 	                   							" LEFT JOIN tm_cities f2 ON f2.id=b.district " +
 								       	 	" WHERE a.approved=0 AND a.is_ins = '0 '   "+
 								       	 	" ORDER BY a.date_bill DESC " + 
-								       	 	" LIMIT 10 "
+								       	 	"  "
 
 								       	 	,
 								      state:  stats_callback,
@@ -81,7 +82,7 @@ module.exports.get_Order_Installment = function(stats_callback,callback,success_
 								       	 	" WHERE a.approved=0 AND a.is_ins = '1 '  AND  g.status='0 '  "+
 
 								       	 	" ORDER BY a.date_bill DESC " + 
-								       	 	"  LIMIT 10 "
+								       	 	"  "
 
 								       	 	,
 								      state:  stats_callback,
@@ -304,7 +305,7 @@ module.exports.get_Data_Sapcode = function(limit,stats_callback,callback,success
 											"  FROM  pro_product  AS a INNER JOIN pro_supplier_product AS b ON a.id=b.cid_product "+
 											
 											" WHERE b.cid_supplier=1 "+
-											"  LIMIT 100"
+											"  "
 								
 								       	 	,
 								      state:  stats_callback,

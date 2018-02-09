@@ -99,9 +99,16 @@ router.get("/update_status",myAuth,function(req,res){
 router.get("/update_or_installment",myAuth,function(req,res){
     controllers.ServermysqlController.update_or_installment(req,res);
 });
+
+
+/* DMCL */
+router.get("/default/server/containerproduct",myAuth,function(req,res){
+    controllers.IndexController.containerproduct(req,res);
+});
+
 function myAuth(req,res,next){
 
-    return next();
+   return next();
 
     if(req.query.token && req.session.mytoken){
         if(req.query.token === req.session.mytoken){

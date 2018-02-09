@@ -4,23 +4,15 @@ const MOrderMysql=require("../models/OrderMysql");
 const Q=require('q');
 
 exports.get_data= function(req,res){
-		var TPromise=[];
-		var View={};
-		let MyStats={};
-		let MyColumns={};
+	
 		var MyResult=[];
 
 
 		
 	
-		 if(req.session.queryidorder != undefined ){
-			 	//MOrder.Kill(req.session.queryidorder,function(err){});
-				 //	res.send("Bạn vừa mới truy vấn rồi .s");
-				 //	return true;
-		 }	
 		 		MOrder.get_Order(
 		 			function(error, query_id, stats){ 
-								  			req.session.queryidorder =query_id;
+								  			
 								  			
 										      	 
 					},
@@ -33,8 +25,7 @@ exports.get_data= function(req,res){
 										 	 }
 
 										 	 
-										  				MyStats=stats;
-										  				MyColumns=columns;
+										  			
 											  			for (var i = data.length - 1; i >= 0; i--) {
 														  		MyResult.push(
 														  			{
@@ -119,7 +110,7 @@ exports.get_data_installment= function(req,res){
 									 
 									 	 if(!data || data === undefined || data === null){
 									 	 	
-									 	 	res.send({message:" - Không tim thấy đơn hàng trả góp. "});
+									 	 	res.send({message:" 1- Không tim thấy đơn hàng trả góp. "});
 									 	 	return true;
 									 	 }
 									  				MyStats=stats;
@@ -182,7 +173,7 @@ exports.get_data_installment= function(req,res){
 										  		
 							},
 							 function(error){
-										  		return res.send({message:" - Không tim thấy đơn hàng trả góp. "});
+										  		return res.send(error);
 									 	 		return true;
 							 }
 						);	
@@ -577,7 +568,7 @@ exports.get_info_product=function(req,res){
 													      	 
 											},
 					 					function(error, data, columns, stats){ 
-					 						return res.send(data);
+					 						
 											 	 if(error){ return res.send(error); }	
 											
 											 	
@@ -612,7 +603,7 @@ exports.get_info_product=function(req,res){
 															  		);
 															  	}
 													
-														return res.send(MyResult);
+														
 													
 											 			
 											 	
@@ -626,7 +617,9 @@ exports.get_info_product=function(req,res){
 										 
 										 if(stats.rootStage.processedRows === 0){
 										 	return res.send({message:" Không có dòng nào "});
-										 }	
+										 }else{
+										 	return res.send(MyResult);
+										 }
 									},
 									 function(error){
 												  		return res.send(error);	
@@ -708,19 +701,19 @@ exports.Informationsupplier=function(req,res){
 						}
 }
 
-exports.get_data_sapcode=function(req,res){
+exports.get_data_sapcode= function(req,res){
 				
 					var MyResult=[];
 
-					var limit = req.query.limit ? req.query.limit : '0,100';
+					var limit = 1000;
 							
-								MOrder.get_Data_Sapcode(
+								 MOrder.get_Data_Sapcode(
 										
 										limit,
 					 					function(error, query_id, stats){ 
 													      	 
 											},
-					 					function(error, data, columns, stats){ 
+					 					  function(error, data, columns, stats){ 
 					 					
 											 	 if(error){ return res.send(error); }	
 											
@@ -730,39 +723,30 @@ exports.get_data_sapcode=function(req,res){
 											 	 	return res.send({message:" - Không tim thấy. "});
 											 	 
 											 	 }
-											  				
-												  			for (var i = data.length - 1; i >= 0; i--) {
-															  		MyResult.push(
-															  			{
-															  				
-																	          sap_code:data[i][0]
-																	         
-																	       
-
-															  			}
-
-															  
-															  		);
-															  	}
-													return res.send(MyResult);
-											 	
-
-												
-												
-														
+											 	for (var i = data.length - 1; i >= 0; i--) {
+													 	 	MyResult.push({sapcode:data[i][0]});
+												}
+	
 														
 									},
-									function(error,stats){
+									async function(error,stats){
 										 if(error){ res.send(error); return true;}	
-										 
-										 if(stats.rootStage.processedRows === 0){
-										 	return res.send({message:" Không có dòng nào "});
-										 }	
+										var t= function(error,stats){
+											 if(stats.rootStage.processedRows === 0){
+											 	return res.send({message:" Không có dòng nào "});
+											 }else{
+											 	return res.send(MyResult);
+											 	
+											 }
+										 }
+										 await t(error,stats);
 									},
 									 function(error){
 												  		return res.send(error);	
 									 }
 								);
+								  
+								
 					
 }
 
