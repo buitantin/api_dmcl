@@ -17,7 +17,7 @@ exports.get_data= function(req,res){
 										      	 
 					},
 		 			function(error, data, columns, stats){
-				 		
+				 	//	return res.send(columns);
 										 	 if(error){ res.send(error ); return true;}	
 										 	 if(!data){
 										 	 	res.send({message:" Không tim thấy đơn hàng "});
@@ -65,7 +65,9 @@ exports.get_data= function(req,res){
 								function(error,stats){
 									 if(error){ res.send(error); return true;}	
 									  	 if(stats.rootStage.processedRows === 0){
-											 	return res.send({message:" Không có dòng nào "});
+											 	return res.send(stats);
+											 }else{
+
 											 }	
 											  		
 								},

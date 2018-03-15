@@ -58,6 +58,7 @@ module.exports.GetProductHome=async function(data){
 						"  "+flied_product+
 						//" ORDER BY (a.id,"+test+")	 "+
 						" LIMIT 8";
+		
 					
 					
 
